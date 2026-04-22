@@ -1,0 +1,206 @@
+--------------------------------------------------------------------------------
+SOBRE O SISTEMA ESPECIALISTA
+  -- Nome:    Sistema especialista PC
+  -- Autores: Lorina Zondervan e Thiago Marinho Solfo
+  -- Resumo:
+     1)    Nome dos acadêmicos.
+     - Lorina Zondervan e Thiago Marinho Solfo
+     
+     2)    Descrição do problema a ser resolvido.
+     - Um sistema especialista para diagnóstico de falhas de inicialização em computadores. Baseado em uma base de conhecimento com regras condicionais ("se então"), o sistema guia o usuário por meio de perguntas sobre os sintomas observados e identifica a causa mais provável, como falha na fonte de alimentação, memória RAM com mau contato ou defeito na placa-mãe.
+     
+     3)    Indicação da abordagem utilizada, explicando o motivo da escolha.
+     - Porque o problema é estruturado, inclusive os sintomas e causas já são conhecidos, então dá pra representar tudo em regras diretamente.
+     
+     4)    Descrição das variáveis consideradas.
+     - botao_ligar : Indica se o botão frontal de ligar está emperrado ou com defeito físico.
+     - cabos_desconectados : Indica se algum cabo interno do PC está desconectado.
+     - capacitor_queimado : Indica se algum capacitor interno do PC está visivelmente queimado.
+     - cheiro_queimado : Indica se há cheiro de queimado perceptível ao abrir o gabinete.
+     - conector_botao_ligar : Indica se o cabo do conector frontal do botão ligar está corretamente conectado à placa-mãe.
+     - fonte : Representa o estado da fonte de alimentação. Valores possíveis: voltagem inadequada, som alto (estouro), cheiro de queimado.
+     - fonte_funcionando : Indica se a fonte de alimentação está funcionando corretamente.
+     - indicio_umidade : Indica se foram encontrados indícios de umidade dentro do gabinete.
+     - jumper : Indica a posição atual do jumper: posição correta, incorreta ou ausência do componente.
+     - placa_mae : Descreve o estado da placa-mãe. Valores possíveis: cheiro de queimado, capacitor estourado.
+     - problema : Variável de conclusão. Contém o diagnóstico final identificado pelo sistema.
+     - ram : Contém os valores para saber se há che1iro de queimado ou está ausente
+     ram_test : Resultado do teste de memória RAM. Valores: sucesso, falha, não realizado.
+     - tomada_energia : Indica a voltagem da tomada elétrica e se está adequada à configuração da fonte.
+     
+     5)    Descrição das regras utilizadas.
+     R1 : Verifica se há indícios de umidade em algum componente do PC. Caso positivo, classifica o problema como dano por umidade.
+     R2 : Verifica se a voltagem que sai da tomada é compatível com a configuração da fonte (110 V ou 220 V).
+     R3 : Verifica se o problema está na fonte de alimentação caso uma das alternativas seja verdadeira: voltagem inadequada, som alto (estouro) ou capacitor estourado.
+     R4 : Verifica se o problema está no botão de ligar do painel frontal, considerando travamento físico ou cabo do conector frontal desconectado.
+     R5 : Verifica se o problema é originado na placa-mãe com base nos sintomas disponíveis (cheiro de queimado ou capacitor estourado).
+     R6 : Verifica se cabos internos desconectados são a causa.
+     R7 : Verifica se o problema é a memória RAM baseando nas alternativas "Ausência" (se não ´um pente instalado) e "ram_test = Falha" se o resultado do teste de RAM é falha
+     R8 : Verifica se o problema na fonte é decorrente de um capacitor queimado. Não aplicado no Expert SINTA devido a bugs na ordem de execução das regras.
+     R9 : Verifica se o problema na placa-mãe é decorrente de um capacitor queimado. Não aplicado no Expert SINTA devido a bugs na ordem de execução das regras.
+
+Operador de maior precedência: conjunção
+Fator de confiança mínimo para aceitação de regra: 50
+
+SOBRE OS ARQUIVOS
+  Arquivo original: E:\THIAGOSOLFO\DESKTOP\SISTEMA-ESPECIALISTA-EXPERTSINTA\PC2.BCM
+  O sistema não possui recursos de ajuda.
+--------------------------------------------------------------------------------
+
+VARIÁVEIS
+
+  botao_ligar
+    Tipo:
+      univalorada
+  cabos_desconectados
+    Tipo:
+      univalorada
+  capacitor_aberto
+    Tipo:
+      univalorada
+  capacitor_queimado
+    Tipo:
+      univalorada
+  cheiro_queimado
+    Tipo:
+      univalorada
+  conector_botao_ligar
+    Tipo:
+      univalorada
+  fonte
+    Valores:
+      Som alto
+      Capacitor estourado
+      Voltagem inadequada
+    Tipo:
+      multivalorada
+  fonte_funcionando
+    Tipo:
+      univalorada
+  indicio_umidade
+    Tipo:
+      univalorada
+  jumper
+    Valores:
+      Pinos 2 3
+      Ausência
+      Pinos 1 2
+    Tipo:
+      univalorada
+  placa_mae
+    Valores:
+      Cheiro de queimado
+      Capacitor estourado
+    Tipo:
+      univalorada
+  problema
+    Valores:
+      RAM
+      Cabos
+      Processador
+      Botão de ligar
+      Umidade
+      Placa mãe
+      Jumper
+      Fonte
+      Tomada
+      Componente queimado
+    Tipo:
+      multivalorada
+  ram
+    Valores:
+      Cheiro de queimado
+      Ausência
+    Tipo:
+      univalorada
+  ram_test
+    Valores:
+      Sucesso
+      Não realizado
+      Falha
+    Tipo:
+      univalorada
+  tomada_energia
+    Tipo:
+      univalorada
+
+OBJETIVOS
+
+  problema
+
+REGRAS
+
+  Regra 1
+    SE indicio_umidade = Sim
+    ENTÃO problema = Umidade CNF 60%
+          problema = RAM CNF 50%
+          problema = Fonte CNF 50%
+          problema = Placa mãe CNF 50%
+
+  Regra 2
+    SE tomada_energia = Não
+    ENTÃO problema = Tomada CNF 100%
+
+  Regra 3
+    SE fonte = Voltagem inadequada
+    OU fonte = Som alto
+    OU fonte = Capacitor estourado
+    ENTÃO problema = Fonte CNF 100%
+
+  Regra 4
+    SE botao_ligar = Sim
+    OU conector_botao_ligar = Não
+    ENTÃO problema = Botão de ligar CNF 100%
+
+  Regra 5
+    SE placa_mae = Cheiro de queimado
+    OU placa_mae = Capacitor estourado
+    ENTÃO problema = Placa mãe CNF 100%
+
+  Regra 6
+    SE cabos_desconectados = Sim
+    ENTÃO problema = Cabos CNF 60%
+
+  Regra 7
+    SE ram = Ausência
+    OU ram_test = Falha
+    ENTÃO problema = RAM CNF 100%
+
+PERGUNTAS
+
+  Variável:botao_ligar
+     Pergunta:"O botão ligar está emperrado?"
+  Variável:cabos_desconectados
+     Pergunta:"Algum cabo está desconectado?"
+  Variável:capacitor_aberto
+     Pergunta:"O capacitor está aberto?"
+  Variável:capacitor_queimado
+     Pergunta:"Algum capacitor está queimado?"
+  Variável:cheiro_queimado
+     Pergunta:"Está sentindo algum cheiro de queimado?"
+  Variável:conector_botao_ligar
+     Pergunta:"O conector frontal do botao de ligar está conectado?"
+  Variável:fonte
+     Pergunta:"Marque as opções que se aplicam sobre a fonte:"
+  Variável:fonte_funcionando
+     Pergunta:"A fonte está funcionando?"
+  Variável:indicio_umidade
+     Pergunta:"Há indícios de humidade?"
+  Variável:jumper
+     Pergunta:"O jumper está posicionado em quais pinos / Ou está ausente?"
+  Variável:placa_mae
+     Pergunta:"Há algum capacitor estourado / Ou cheiro de queimado?"
+  Variável:ram
+     Pergunta:"A RAM está com algum cheiro de queimado / Ou não há nenhuma RAM colocada?"
+  Variável:ram_test
+     Pergunta:"Realizou um teste da RAM? Se sim, qual foi o resultado?"
+  Variável:tomada_energia
+     Pergunta:"A voltagem da tomada é adequada ao PC (110 ou 220) com a fonte?"
+     Motivo:"A voltagem da sua casa/apto deve ser a mesma da fonte do seu PC
+
+--------------------------------------------------------------------------------
+Gerado com o Expert SINTA versão 1.1b
+(c) 1997 - Universidade Federal do Ceará
+           Laboratório de Inteligência Artificial
+           LIA/UFC
+--------------------------------------------------------------------------------
